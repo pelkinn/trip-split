@@ -25,11 +25,10 @@ export default defineNuxtPlugin((app) => {
         default: {
           dark: false,
           colors: {
-            primary: colors.teal.base,
-            secondary: colors.grey.darken4,
-            success: colors.green.base,
-            error: colors.red.base,
-            "success-lighten-5": colors.green.lighten5,
+            primary: colors.cyan.base,
+            secondary: colors.pink.lighten3,
+            success: colors.green.lighten2,
+            error: colors.red.lighten2,
           },
         },
       },
@@ -40,13 +39,14 @@ export default defineNuxtPlugin((app) => {
         color: "primary",
         flat: true,
         variant: "flat",
+        style: "text-transform: none;",
       },
       VTextField: {
-        variant: "outlined",
+        variant: "solo",
         density: "comfortable",
       },
       VSelect: {
-        variant: "outlined",
+        variant: "solo",
         density: "comfortable",
       },
     },

@@ -1,14 +1,16 @@
 <template>
   <div>
-    <h1 class="text-center mb-12">TripSplit</h1>
+    <div class="d-flex justify-center mb-12">
+      <img width="200" src="~/assets/img/logo.png" alt="" />
+    </div>
     <div class="wrapper">
       <div class="grid">
-        <VCard flat>
+        <div>
           <p class="text-h6 mb-4">Название поездки</p>
           <VTextField v-model="form.name" label="Название поездки" />
-        </VCard>
+        </div>
 
-        <VCard flat>
+        <div>
           <p class="text-h6 mb-4">Участники</p>
           <VTextField
             v-for="(participant, index) in form.participants"
@@ -22,9 +24,9 @@
           <VBtn size="small" color="secondary" @click="addParticipant"
             >Добавить участника</VBtn
           >
-        </VCard>
+        </div>
 
-        <VCard flat>
+        <div>
           <p class="text-h6 mb-4">Расходы</p>
           <VCard
             v-for="(expense, i) in form.expenses"
@@ -62,7 +64,7 @@
           <VBtn size="small" color="secondary" @click="addExpense"
             >Добавить расход</VBtn
           >
-        </VCard>
+        </div>
         <VBtn class="mt-12" @click="createTrip">Рассчитать</VBtn>
       </div>
       <div>
