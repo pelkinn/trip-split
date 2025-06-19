@@ -10,10 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
     "@nuxt/eslint": "^1.4.1",
     "eslint": "^9.29.0",
     "nuxt": "^3.17.5",
+    "uuid": "^11.1.0",
     "vue": "^3.5.16",
     "vue-router": "^4.5.1"
   },

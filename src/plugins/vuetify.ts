@@ -18,6 +18,38 @@ export default defineNuxtPlugin((app) => {
       },
       sets: { mdi },
     },
+
+    theme: {
+      defaultTheme: "default",
+      themes: {
+        default: {
+          dark: false,
+          colors: {
+            primary: colors.teal.base,
+            secondary: colors.grey.darken4,
+            success: colors.green.base,
+            error: colors.red.base,
+            "success-lighten-5": colors.green.lighten5,
+          },
+        },
+      },
+    },
+
+    defaults: {
+      VBtn: {
+        color: "primary",
+        flat: true,
+        variant: "flat",
+      },
+      VTextField: {
+        variant: "outlined",
+        density: "comfortable",
+      },
+      VSelect: {
+        variant: "outlined",
+        density: "comfortable",
+      },
+    },
   });
   app.vueApp.use(vuetify);
 });
