@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="d-flex justify-center mb-12">
+    <div class="d-flex justify-center mb-4 mb-sm-12">
       <img width="200" src="~/assets/img/logo.png" alt="" />
     </div>
     <div class="wrapper">
@@ -15,10 +15,10 @@
           <VTextField
             v-for="(participant, index) in form.participants"
             :key="participant.id"
+            :ref="(el) => setFieldRef(el, index)"
             v-model="form.participants[index].name"
             label="Имя участника"
             :append-icon="index ? mdiClose : ''"
-            focused
             @click:append="removeParticipant(index)"
           />
           <VBtn size="small" color="secondary" @click="addParticipant"
@@ -65,13 +65,21 @@
             >Добавить расход</VBtn
           >
         </div>
-        <VBtn class="mt-12" @click="createTrip">Рассчитать</VBtn>
-      </div>
-      <div>
-        <p class="text-h6 mb-4">Результат</p>
-        <div v-for="item in readableDebts" :key="item">{{ item }}</div>
+        <div class="mt-12 d-flex flex-column">
+          <VBtn @click="createTrip">Рассчитать</VBtn>
+          <VBtn
+            v-if="readableDebts.length"
+            class="mt-4"
+            color="error"
+            variant="tonal"
+            @click="clear"
+            >Очистить результат</VBtn
+          >
+        </div>
       </div>
     </div>
+
+    <ResultDialog v-model="modelDialog" :result="readableDebts" />
   </div>
 </template>
 
@@ -79,6 +87,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { mdiClose } from "@mdi/js";
 import type { Balance, Expense, Participant, Trip } from "~/type/common";
+import type { VTextField } from "vuetify/components";
 
 const form = ref<{
   name: string;
@@ -90,8 +99,25 @@ const form = ref<{
   expenses: [],
 });
 
+const fieldRefs = ref<(InstanceType<typeof VTextField> | null)[]>([]);
+
+const modelDialog = ref(false);
+
+const setFieldRef = (
+  el: Element | ComponentPublicInstance | null,
+  index: number
+) => {
+  if (el) {
+    fieldRefs.value[index] = el as InstanceType<typeof VTextField> | null;
+  }
+};
+
 const addParticipant = () => {
   form.value.participants.push({ id: uuidv4(), name: "" });
+  nextTick(() => {
+    const lastIndex = form.value.participants.length - 1;
+    fieldRefs.value[lastIndex]?.focus();
+  });
 };
 
 const removeParticipant = (i: number) => {
@@ -112,6 +138,8 @@ const createTrip = () => {
   const rawBalance = calculateBalance(trip);
   const simplified = simplifyBalance(rawBalance);
   readableDebts.value = formatBalanceToText(simplified, trip.participants);
+
+  modelDialog.value = true;
 };
 
 const addExpense = () => {
@@ -210,13 +238,27 @@ const formatBalanceToText = (
 
   return result;
 };
+
+const clear = () => {
+  form.value.name = "";
+  form.value.participants = [];
+  form.value.expenses = [];
+};
 </script>
 
 <style lang="css" scoped>
 .wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 32px;
+
+  @media screen and (min-width: 600px) {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  @media screen and (min-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .grid {
