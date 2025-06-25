@@ -12,6 +12,7 @@
   "dependencies": {
     "@mdi/js": "^7.4.47",
     "@nuxt/eslint": "^1.4.1",
+    "@vite-pwa/nuxt": "^1.0.4",
     "eslint": "^9.29.0",
     "nuxt": "^3.17.5",
     "uuid": "^11.1.0",
