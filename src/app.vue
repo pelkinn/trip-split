@@ -6,6 +6,7 @@
       </VContainer>
     </v-main>
   </v-app>
+  <VitePwaManifest />
 </template>
 
 <style scoped>
