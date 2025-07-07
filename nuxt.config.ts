@@ -6,6 +6,14 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   srcDir: "./src/",
 
+  runtimeConfig: {
+    public: {
+      yandexMetrika: {
+        id: 103233734,
+      },
+    },
+  },
+
   app: {
     head: {
       htmlAttrs: { lang: "ru" },
@@ -28,10 +36,13 @@ export default defineNuxtConfig({
       ],
     },
   },
+
   css: ["~/assets/style/main.scss"],
+
   build: {
     transpile: ["vuetify"],
   },
+
   modules: [
     "@nuxt/eslint",
     "@vite-pwa/nuxt",
@@ -41,7 +52,9 @@ export default defineNuxtConfig({
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
+    "~/modules/yandexMetrika",
   ],
+
   vite: {
     vue: {
       template: {
@@ -49,6 +62,7 @@ export default defineNuxtConfig({
       },
     },
   },
+
   pwa: {
     registerType: "autoUpdate",
     workbox: {

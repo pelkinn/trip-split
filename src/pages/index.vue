@@ -1,9 +1,17 @@
 <template>
   <div>
     <div class="d-flex justify-center img-wrapper">
-      <img width="135" src="~/assets/img/logo.png" alt="" />
+      <img src="~/assets/img/logo.png" alt="" />
     </div>
+
     <div class="wrapper">
+      <h1 class="text-h5 text-center mb-2">
+        Никакой путаницы в совместных расходах
+      </h1>
+      <p class="text-body-2 text-center mb-10">
+        Добавляйте участников и расходы за пару кликов, мгновенно получайте, кто
+        кому сколько должен, и копируйте результат в чат одним нажатием.
+      </p>
       <div class="grid">
         <div>
           <VTextField v-model="form.name" label="Название поездки" />
@@ -266,6 +274,9 @@ const formatBalanceToText = (
     forCopy: [],
   };
 
+  result.forCopy.push(form.value.name);
+  result.forCopy.push("");
+
   for (const debtorId in balance) {
     for (const creditorId in balance[debtorId]) {
       const amount = balance[debtorId][creditorId];
@@ -298,7 +309,10 @@ const disabledBtnCalculate = computed(() => {
 });
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
+@use "sass:map";
+@use "vuetify/settings" as v;
+
 .wrapper {
   max-width: 640px;
   margin: 0 auto;
@@ -312,6 +326,18 @@ const disabledBtnCalculate = computed(() => {
 }
 
 .img-wrapper {
-  margin-bottom: 80px;
+  margin-bottom: 40px;
+
+  @media #{map.get(v.$display-breakpoints, 'sm-and-up')} {
+    margin-bottom: 60px;
+  }
+
+  img {
+    max-width: 100px;
+
+    @media #{map.get(v.$display-breakpoints, 'sm-and-up')} {
+      max-width: 135px;
+    }
+  }
 }
 </style>

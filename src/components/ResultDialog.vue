@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { mdiArrowRight, mdiArrowRightThin } from "@mdi/js";
+import { mdiArrowRightThin } from "@mdi/js";
 import type { Result } from "~/type/common";
 
 const model = defineModel<boolean>();
