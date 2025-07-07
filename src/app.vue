@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main class="main">
-      <VContainer max-width="1200">
+      <VContainer max-width="1200" class="mb-15">
         <NuxtPage />
       </VContainer>
       <div class="text-center pa-2 mt-auto">
