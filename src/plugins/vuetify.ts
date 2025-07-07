@@ -26,7 +26,7 @@ export default defineNuxtPlugin((app) => {
           dark: false,
           colors: {
             primary: colors.cyan.base,
-            secondary: colors.pink.lighten3,
+            secondary: colors.deepOrange.darken1,
             success: colors.green.lighten2,
             error: colors.red.lighten2,
           },
@@ -39,15 +39,19 @@ export default defineNuxtPlugin((app) => {
         color: "primary",
         flat: true,
         variant: "flat",
-        style: "text-transform: none;",
+        size: "large",
+        rounded: "xl",
+        class: "font-weight-bold",
       },
       VTextField: {
         variant: "solo",
-        density: "comfortable",
+        flat: true,
+        hideDetails: true,
       },
       VSelect: {
         variant: "solo",
-        density: "comfortable",
+        flat: true,
+        hideDetails: true,
       },
     },
   });

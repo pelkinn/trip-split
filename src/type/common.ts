@@ -31,3 +31,12 @@ export interface Debt {
   to: string; // participant.id
   amount: number;
 }
+
+export interface Result {
+  items: {
+    debtorName: string;
+    creditorName: string;
+    amount: number;
+  }[];
+  forCopy: string[];
+}

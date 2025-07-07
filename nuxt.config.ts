@@ -28,6 +28,7 @@ export default defineNuxtConfig({
       ],
     },
   },
+  css: ["~/assets/style/main.scss"],
   build: {
     transpile: ["vuetify"],
   },
@@ -56,8 +57,8 @@ export default defineNuxtConfig({
     },
     manifest: {
       name: "TripSplit",
-      short_name: "trip-split",
-      description: "Рассчет долгов при совместных покупках",
+      short_name: "TripSplit",
+      description: "Рассчет долгов при совместных тратах",
       lang: "ru",
       theme_color: "#e0f7fa",
       background_color: "#e0f7fa",

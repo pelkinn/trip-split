@@ -1,0 +1,19 @@
+@forward "@fontsource/ruda/400.css";
+@forward "@fontsource/ruda/500.css";
+@forward "@fontsource/ruda/700.css";
+
+body,
+.text-h5,
+.text-h6 {
+  font-family: "Ruda" !important;
+}
+
+body {
+  .v-btn .v-btn__content {
+    letter-spacing: normal !important;
+  }
+
+  .v-text-field .v-field {
+    border-radius: 12px;
+  }
+}
