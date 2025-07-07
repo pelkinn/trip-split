@@ -26,7 +26,7 @@
             v-model="form.participants[index].name"
             label="Имя участника"
             class="mb-2"
-            :class="index ? 'mb-2' : 'mb-5'"
+            :class="index === form.participants.length - 1 ? 'mb-5' : 'mb-2'"
           >
             <template #append
               ><VIcon
