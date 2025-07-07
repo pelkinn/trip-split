@@ -27,7 +27,8 @@ export default defineNuxtConfig({
         // { name: 'google-site-verification', content: 'V1sd-BGehuD9veqlhBvVU80mPIIaq4b9-sw9AI4W71w' },
         {
           name: "description",
-          content: "TripSplit - калькулятор рассчета долгов",
+          content:
+            "TripSplit — калькулятор совместных расходов. Безлимит участников, офлайн‑режим и мгновенный расчёт долгов с копированием результата в один клик.",
         },
       ],
       link: [
