@@ -13,6 +13,7 @@
     "@fontsource/ruda": "^5.2.6",
     "@mdi/js": "^7.4.47",
     "@nuxt/eslint": "^1.4.1",
+    "@nuxtjs/sitemap": "^7.4.3",
     "@vite-pwa/nuxt": "^1.0.4",
     "eslint": "^9.29.0",
     "nuxt": "^3.17.5",

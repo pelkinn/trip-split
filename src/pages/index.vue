@@ -5,9 +5,10 @@
     </div>
 
     <div class="wrapper">
-      <h1 class="text-h5 text-center mb-2">
+      <h1>TripSplit - калькулятор совместынх расходов</h1>
+      <div class="text-h5 text-center mb-2">
         Никакой путаницы в совместных расходах
-      </h1>
+      </div>
       <p class="text-body-2 text-center mb-10">
         Добавляйте участников и расходы за пару кликов, мгновенно получайте, кто
         кому сколько должен, и копируйте результат в чат одним нажатием.
@@ -61,6 +62,7 @@
               v-model="form.expenses[i].amount"
               class="mb-2"
               label="Сумма"
+              type="number"
             />
             <VSelect
               v-model="form.expenses[i].paidBy"
@@ -339,5 +341,11 @@ const disabledBtnCalculate = computed(() => {
       max-width: 135px;
     }
   }
+}
+
+h1 {
+  opacity: 0;
+  height: 0;
+  width: 0;
 }
 </style>

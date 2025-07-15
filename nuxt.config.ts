@@ -17,18 +17,32 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: "ru" },
-      title: "TripSplit",
+      title: "TripSplit — Калькулятор совместных расходов",
       meta: [
         { charset: "utf-8" },
         { name: "language", content: "ru" },
         { "http-equiv": "content-language", content: "ru" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        // { name: 'yandex-verification', content: '131d5a2f63496c80' },
-        // { name: 'google-site-verification', content: 'V1sd-BGehuD9veqlhBvVU80mPIIaq4b9-sw9AI4W71w' },
         {
           name: "description",
           content:
             "TripSplit — калькулятор совместных расходов. Безлимит участников, офлайн‑режим и мгновенный расчёт долгов с копированием результата в один клик.",
+        },
+
+        {
+          property: "og:title",
+          content: "TripSplit — калькулятор совместных расходов",
+        },
+        {
+          property: "og:description",
+          content:
+            "Простой способ разделить расходы между участниками поездки.",
+        },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://trip-split.ru" },
+        {
+          property: "og:image",
+          content: "https://trip-split.ru/pwa-192x192.png",
         },
       ],
       link: [
@@ -47,13 +61,14 @@ export default defineNuxtConfig({
   modules: [
     "@nuxt/eslint",
     "@vite-pwa/nuxt",
+    "~/modules/yandexMetrika",
+    "@nuxtjs/sitemap",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
-    "~/modules/yandexMetrika",
   ],
 
   vite: {
@@ -90,5 +105,10 @@ export default defineNuxtConfig({
         },
       ],
     },
+  },
+
+  site: {
+    url: "https://trip-split.ru",
+    name: "TripSplit — калькулятор совместных расходов",
   },
 });
