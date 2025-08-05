@@ -173,7 +173,7 @@ const removeParticipant = (i: number) => {
   form.value.expenses.forEach((expense) => {
     expense.sharedWith = expense.sharedWith.filter((id) => id !== removedId);
     if (expense.paidBy === removedId) {
-      expense.paidBy = form.value.participants[0]?.id || null;
+      expense.paidBy = null;
     }
   });
 };
