@@ -167,7 +167,15 @@ const addParticipant = () => {
 };
 
 const removeParticipant = (i: number) => {
+  const removedId = form.value.participants[i].id;
   form.value.participants.splice(i, 1);
+
+  form.value.expenses.forEach((expense) => {
+    expense.sharedWith = expense.sharedWith.filter((id) => id !== removedId);
+    if (expense.paidBy === removedId) {
+      expense.paidBy = form.value.participants[0]?.id || null;
+    }
+  });
 };
 
 const readableDebts = ref<Result>({
