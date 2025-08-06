@@ -103,12 +103,11 @@
         <div class="d-flex flex-column">
           <VBtn
             color="black"
-            :disabled="disabledBtnCalculate"
             @click="createTrip"
             >Рассчитать</VBtn
           >
           <VBtn
-            v-if="readableDebts?.items.length"
+            v-if="readableDebts?.items.length || (readableDebts?.forCopy && readableDebts.forCopy.length > 2)"
             class="mt-4"
             variant="outlined"
             color="black"
@@ -120,6 +119,27 @@
     </div>
 
     <ResultDialog v-model="modelDialog" :result="readableDebts" />
+    
+    <!-- Snackbar для уведомлений об ошибках -->
+    <VSnackbar
+      v-model="showErrorSnackbar"
+      color="error"
+      timeout="5000"
+      location="top"
+    >
+      {{ errorMessage }}
+      
+      <template #actions>
+        <VBtn
+          color="white"
+          variant="text"
+          size="small"
+          @click="showErrorSnackbar = false"
+        >
+          Закрыть
+        </VBtn>
+      </template>
+    </VSnackbar>
   </div>
 </template>
 
@@ -149,6 +169,10 @@ const fieldRefs = ref<(InstanceType<typeof VTextField> | null)[]>([]);
 
 const modelDialog = ref(false);
 
+// Переменные для уведомлений об ошибках
+const showErrorSnackbar = ref(false);
+const errorMessage = ref("");
+
 const setFieldRef = (
   el: Element | ComponentPublicInstance | null,
   index: number
@@ -167,7 +191,15 @@ const addParticipant = () => {
 };
 
 const removeParticipant = (i: number) => {
+  const removedId = form.value.participants[i].id;
   form.value.participants.splice(i, 1);
+
+  form.value.expenses.forEach((expense) => {
+    expense.sharedWith = expense.sharedWith.filter((id) => id !== removedId);
+    if (expense.paidBy === removedId) {
+      expense.paidBy = '';
+    }
+  });
 };
 
 const readableDebts = ref<Result>({
@@ -175,7 +207,77 @@ const readableDebts = ref<Result>({
   forCopy: [],
 });
 
+// Функция валидации формы
+const validateForm = (): { isValid: boolean; message: string } => {
+  // Проверяем, что есть хотя бы один участник
+  if (!form.value.participants.length) {
+    return {
+      isValid: false,
+      message: "Добавьте хотя бы одного участника"
+    };
+  }
+
+  // Проверяем, что все участники имеют имена
+  const emptyParticipantIndex = form.value.participants.findIndex(
+    (participant) => !participant.name.trim()
+  );
+  if (emptyParticipantIndex !== -1) {
+    return {
+      isValid: false,
+      message: `Заполните имя участника №${emptyParticipantIndex + 1}`
+    };
+  }
+
+  // Проверяем, что есть хотя бы один расход
+  if (!form.value.expenses.length) {
+    return {
+      isValid: false,
+      message: "Добавьте хотя бы один расход"
+    };
+  }
+
+  // Проверяем, что все расходы заполнены корректно
+  for (let i = 0; i < form.value.expenses.length; i++) {
+    const expense = form.value.expenses[i];
+    
+    // Проверяем сумму
+    if (!expense.amount || expense.amount <= 0) {
+      return {
+        isValid: false,
+        message: `Введите сумму больше 0 для расхода №${i + 1}`
+      };
+    }
+    
+    // Проверяем, кто заплатил
+    if (!expense.paidBy) {
+      return {
+        isValid: false,
+        message: `Выберите, кто заплатил за расход №${i + 1}`
+      };
+    }
+    
+    // Проверяем, что есть хотя бы один участник для разделения расхода
+    if (!expense.sharedWith || expense.sharedWith.length === 0) {
+      return {
+        isValid: false,
+        message: `Выберите участников для разделения расхода №${i + 1}`
+      };
+    }
+  }
+
+  return { isValid: true, message: "" };
+};
+
 const createTrip = () => {
+  // Валидируем форму
+  const validation = validateForm();
+  
+  if (!validation.isValid) {
+    errorMessage.value = validation.message;
+    showErrorSnackbar.value = true;
+    return;
+  }
+
   const trip: Trip = {
     id: uuidv4(),
     name: form.value.name,
@@ -274,10 +376,13 @@ const formatBalanceToText = (
   const result: Result = {
     items: [],
     forCopy: [],
-  };
+  };  
 
-  result.forCopy.push(form.value.name);
-  result.forCopy.push("");
+  // Проверяем количество участников
+  if (participants.length === 1) {
+    result.forCopy.push("Никаких долгов нет - все расходы свои!");
+    return result;
+  }
 
   for (const debtorId in balance) {
     for (const creditorId in balance[debtorId]) {
@@ -306,9 +411,7 @@ const clear = () => {
   form.value.expenses = [];
 };
 
-const disabledBtnCalculate = computed(() => {
-  return !form.value.participants.length && !form.value.expenses.length;
-});
+
 </script>
 
 <style lang="scss" scoped>

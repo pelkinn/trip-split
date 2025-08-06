@@ -3,7 +3,7 @@
     <VCard class="pa-6">
       <div class="mb-8">
         <p class="text-h6 mb-8 font-weight-bold">РЕЗУЛЬТАТ</p>
-        <p v-if="!result.items.length" class="text-center">
+        <p v-if="!result.items.length && !result.forCopy.slice(2).length" class="text-center">
           Введите корректные данные
         </p>
         <div v-for="(item, index) in result.items" :key="item.debtorName">
@@ -27,7 +27,7 @@
               v-bind="props"
               class="mb-4 mb-sm-0 mr-sm-2"
               color="black"
-              :disabled="!result.items.length"
+              :disabled="!result.items.length && !result.forCopy.slice(2).length"
               @click="copyResult"
               >Копировать результат</VBtn
             >
