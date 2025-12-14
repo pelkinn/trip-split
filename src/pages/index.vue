@@ -101,13 +101,12 @@
           >
         </div>
         <div class="d-flex flex-column">
+          <VBtn color="black" @click="createTrip">Рассчитать</VBtn>
           <VBtn
-            color="black"
-            @click="createTrip"
-            >Рассчитать</VBtn
-          >
-          <VBtn
-            v-if="readableDebts?.items.length || (readableDebts?.forCopy && readableDebts.forCopy.length > 2)"
+            v-if="
+              readableDebts?.items.length ||
+              (readableDebts?.forCopy && readableDebts.forCopy.length > 2)
+            "
             class="mt-4"
             variant="outlined"
             color="black"
@@ -119,7 +118,19 @@
     </div>
 
     <ResultDialog v-model="modelDialog" :result="readableDebts" />
-    
+    <ExampleDialog v-model="modelExampleDialog" />
+
+    <div class="d-flex justify-center">
+      <VBtn
+        color="black"
+        size="small"
+        variant="outlined"
+        class="mt-4"
+        @click="modelExampleDialog = true"
+        >Пример расчета</VBtn
+      >
+    </div>
+
     <!-- Snackbar для уведомлений об ошибках -->
     <VSnackbar
       v-model="showErrorSnackbar"
@@ -128,7 +139,7 @@
       location="top"
     >
       {{ errorMessage }}
-      
+
       <template #actions>
         <VBtn
           color="white"
@@ -168,7 +179,7 @@ const form = ref<{
 const fieldRefs = ref<(InstanceType<typeof VTextField> | null)[]>([]);
 
 const modelDialog = ref(false);
-
+const modelExampleDialog = ref(false);
 // Переменные для уведомлений об ошибках
 const showErrorSnackbar = ref(false);
 const errorMessage = ref("");
@@ -197,7 +208,7 @@ const removeParticipant = (i: number) => {
   form.value.expenses.forEach((expense) => {
     expense.sharedWith = expense.sharedWith.filter((id) => id !== removedId);
     if (expense.paidBy === removedId) {
-      expense.paidBy = '';
+      expense.paidBy = "";
     }
   });
 };
@@ -213,7 +224,7 @@ const validateForm = (): { isValid: boolean; message: string } => {
   if (!form.value.participants.length) {
     return {
       isValid: false,
-      message: "Добавьте хотя бы одного участника"
+      message: "Добавьте хотя бы одного участника",
     };
   }
 
@@ -224,7 +235,7 @@ const validateForm = (): { isValid: boolean; message: string } => {
   if (emptyParticipantIndex !== -1) {
     return {
       isValid: false,
-      message: `Заполните имя участника №${emptyParticipantIndex + 1}`
+      message: `Заполните имя участника №${emptyParticipantIndex + 1}`,
     };
   }
 
@@ -232,35 +243,35 @@ const validateForm = (): { isValid: boolean; message: string } => {
   if (!form.value.expenses.length) {
     return {
       isValid: false,
-      message: "Добавьте хотя бы один расход"
+      message: "Добавьте хотя бы один расход",
     };
   }
 
   // Проверяем, что все расходы заполнены корректно
   for (let i = 0; i < form.value.expenses.length; i++) {
     const expense = form.value.expenses[i];
-    
+
     // Проверяем сумму
     if (!expense.amount || expense.amount <= 0) {
       return {
         isValid: false,
-        message: `Введите сумму больше 0 для расхода №${i + 1}`
+        message: `Введите сумму больше 0 для расхода №${i + 1}`,
       };
     }
-    
+
     // Проверяем, кто заплатил
     if (!expense.paidBy) {
       return {
         isValid: false,
-        message: `Выберите, кто заплатил за расход №${i + 1}`
+        message: `Выберите, кто заплатил за расход №${i + 1}`,
       };
     }
-    
+
     // Проверяем, что есть хотя бы один участник для разделения расхода
     if (!expense.sharedWith || expense.sharedWith.length === 0) {
       return {
         isValid: false,
-        message: `Выберите участников для разделения расхода №${i + 1}`
+        message: `Выберите участников для разделения расхода №${i + 1}`,
       };
     }
   }
@@ -271,7 +282,7 @@ const validateForm = (): { isValid: boolean; message: string } => {
 const createTrip = () => {
   // Валидируем форму
   const validation = validateForm();
-  
+
   if (!validation.isValid) {
     errorMessage.value = validation.message;
     showErrorSnackbar.value = true;
@@ -376,7 +387,7 @@ const formatBalanceToText = (
   const result: Result = {
     items: [],
     forCopy: [],
-  };  
+  };
 
   // Проверяем количество участников
   if (participants.length === 1) {
@@ -410,8 +421,6 @@ const clear = () => {
   form.value.participants = [];
   form.value.expenses = [];
 };
-
-
 </script>
 
 <style lang="scss" scoped>

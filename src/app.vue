@@ -4,15 +4,6 @@
       <VContainer max-width="1200" class="mb-15">
         <NuxtPage />
       </VContainer>
-      <div class="text-center pa-2 mt-auto">
-        <a
-          href="https://t.me/pelkin"
-          class="text-primary text-decoration-none"
-          target="_blank"
-        >
-          💬 Есть вопрос? Пишите в Telegram
-        </a>
-      </div>
     </v-main>
   </v-app>
   <VitePwaManifest />
@@ -23,5 +14,18 @@
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+}
+
+.main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/pattern.webp");
+  background-repeat: repeat;
+  background-size: 300px;
+  opacity: 0.09;
 }
 </style>
