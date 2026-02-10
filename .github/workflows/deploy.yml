@@ -1,0 +1,60 @@
+name: Build and deploy frontend (static)
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate static site
+        run: npm run generate
+      - name: Upload static artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: .output/public
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download static artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: static-site
+          path: static-site
+      - name: List downloaded files
+        run: ls -la static-site
+      - name: Prepare target directory
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e
+            rm -rf /opt/trip-split/*
+      - name: Upload static files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: static-site/**
+          target: /opt/trip-split
+          strip_components: 1
