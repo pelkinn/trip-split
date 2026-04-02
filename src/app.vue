@@ -28,6 +28,7 @@
   background: transparent !important;
   justify-content: center;
   padding: 16px;
+  position: absolute !important;
 }
 
 .footer__content,
@@ -50,9 +51,9 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/pattern.webp");
+  background-image: url("/summer.jpg");
   background-repeat: repeat;
-  background-size: 300px;
-  opacity: 0.09;
+  background-size: 800px;
+  opacity: 0.05;
 }
 </style>
