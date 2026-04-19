@@ -131,6 +131,17 @@
       >
     </div>
 
+    <div v-if="canInstallApp" class="d-flex justify-center mt-14 mb-6">
+      <VBtn
+        color="primary"
+        rounded="pill"
+        :loading="installingApp"
+        class="text-white"
+        @click="installApp"
+        >Установить приложение</VBtn
+      >
+    </div>
+
     <!-- Snackbar для уведомлений об ошибках -->
     <VSnackbar
       v-model="showErrorSnackbar"
@@ -166,6 +177,54 @@ import type {
 } from "~/type/common";
 import type { VTextField } from "vuetify/components";
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+}
+
+const deferredInstallPrompt = ref<BeforeInstallPromptEvent | null>(null);
+const installingApp = ref(false);
+const canInstallApp = computed(() => Boolean(deferredInstallPrompt.value));
+
+const onBeforeInstallPrompt = (event: Event) => {
+  const installEvent = event as BeforeInstallPromptEvent;
+  installEvent.preventDefault();
+  deferredInstallPrompt.value = installEvent;
+};
+
+const onAppInstalled = () => {
+  deferredInstallPrompt.value = null;
+};
+
+onMounted(() => {
+  window.addEventListener(
+    "beforeinstallprompt",
+    onBeforeInstallPrompt as EventListener,
+  );
+  window.addEventListener("appinstalled", onAppInstalled);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener(
+    "beforeinstallprompt",
+    onBeforeInstallPrompt as EventListener,
+  );
+  window.removeEventListener("appinstalled", onAppInstalled);
+});
+
+async function installApp() {
+  const prompt = deferredInstallPrompt.value;
+  if (!prompt) return;
+  installingApp.value = true;
+  try {
+    await prompt.prompt();
+    await prompt.userChoice;
+  } finally {
+    installingApp.value = false;
+    deferredInstallPrompt.value = null;
+  }
+}
+
 const form = ref<{
   name: string;
   participants: Participant[];
@@ -186,7 +245,7 @@ const errorMessage = ref("");
 
 const setFieldRef = (
   el: Element | ComponentPublicInstance | null,
-  index: number
+  index: number,
 ) => {
   if (el) {
     fieldRefs.value[index] = el as InstanceType<typeof VTextField> | null;
@@ -230,7 +289,7 @@ const validateForm = (): { isValid: boolean; message: string } => {
 
   // Проверяем, что все участники имеют имена
   const emptyParticipantIndex = form.value.participants.findIndex(
-    (participant) => !participant.name.trim()
+    (participant) => !participant.name.trim(),
   );
   if (emptyParticipantIndex !== -1) {
     return {
@@ -379,7 +438,7 @@ const simplifyBalance = (balance: Balance): Balance => {
 
 const formatBalanceToText = (
   balance: Balance,
-  participants: Participant[]
+  participants: Participant[],
 ): Result => {
   const getNameById = (id: string) =>
     participants.find((p) => p.id === id)?.name || id;
