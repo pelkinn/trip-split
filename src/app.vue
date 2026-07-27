@@ -18,15 +18,19 @@
           </a>
         </div>
         <div v-if="DONATE_URL" class="footer__donate">
-          Сервис бесплатный и сделан одним человеком. Если помог —
-          <a
+          <div class="mb-2">Сервис бесплатный и сделан одним человеком</div>
+          <VBtn
             :href="DONATE_URL"
+            :prepend-icon="mdiCoffee"
             target="_blank"
             rel="noopener noreferrer"
-            @click="reachGoal('donate_click')"
+            color="primary"
+            variant="tonal"
+            size="small"
+            rounded="pill"
+            @click="reachGoal('donate_click', { place: 'footer' })"
+            >Купить кофе автору</VBtn
           >
-            можно закинуть на кофе
-          </a>
         </div>
       </div>
     </v-footer>
@@ -35,8 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-// ссылка на донат (ЮMoney / CloudTips). Пусто — блок в подвале не показывается
-const DONATE_URL = "https://pay.cloudtips.ru/p/7e481b45";
+import { mdiCoffee } from "@mdi/js";
 
 const reachGoal = useMetrikaGoal();
 </script>
@@ -68,14 +71,16 @@ const reachGoal = useMetrikaGoal();
 }
 
 .footer__donate {
-  margin-top: 4px;
+  margin-top: 12px;
 }
 
-.footer__donate a {
-  text-decoration: underline;
+/* кнопка доната — не ссылка в тексте, подчёркивание и серый цвет ей не нужны */
+.footer__content a.v-btn {
+  color: inherit;
+  text-decoration: none;
 }
 
-.footer__content a:hover {
+.footer__content a:not(.v-btn):hover {
   color: rgba(0, 0, 0, 0.8);
   text-decoration: underline;
 }

@@ -51,6 +51,30 @@
           >Закрыть</VBtn
         >
       </div>
+
+      <!-- просим о поддержке только после удачного расчёта: человек уже
+           получил пользу, до этого момента просить не за что -->
+      <template v-if="result.items.length && DONATE_URL">
+        <VDivider class="my-6" />
+
+        <div class="d-flex flex-column align-center text-center">
+          <p class="text-body-2 text-medium-emphasis mb-3">
+            Калькулятор бесплатный и без рекламы. Его делает и поддерживает один
+            человек
+          </p>
+          <VBtn
+            :href="DONATE_URL"
+            :prepend-icon="mdiCoffee"
+            target="_blank"
+            rel="noopener noreferrer"
+            color="primary"
+            variant="tonal"
+            rounded="pill"
+            @click="reachGoal('donate_click', { place: 'result' })"
+            >Купить кофе автору</VBtn
+          >
+        </div>
+      </template>
     </VCard>
   </VDialog>
 
@@ -64,7 +88,7 @@
 </template>
 
 <script lang="ts" setup>
-import { mdiArrowRightThin } from "@mdi/js";
+import { mdiArrowRightThin, mdiCoffee } from "@mdi/js";
 import type { Result } from "~/type/common";
 
 const model = defineModel<boolean>();
