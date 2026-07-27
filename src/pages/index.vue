@@ -119,7 +119,11 @@
       </div>
     </div>
 
-    <ResultDialog v-model="modelDialog" :result="readableDebts" />
+    <ResultDialog
+      v-model="modelDialog"
+      :result="readableDebts"
+      :link="tripLink"
+    />
     <ExampleDialog v-model="modelExampleDialog" />
 
     <div class="d-flex justify-center">
@@ -143,6 +147,15 @@
         >Установить приложение</VBtn
       >
     </div>
+
+    <VSnackbar
+      v-model="showLoadedFromLink"
+      color="success"
+      timeout="5000"
+      location="top"
+    >
+      Загружен расчёт из ссылки — можно дополнить своими тратами
+    </VSnackbar>
 
     <!-- Snackbar для уведомлений об ошибках -->
     <VSnackbar
@@ -170,7 +183,8 @@
 <script lang="ts" setup>
 import { v4 as uuidv4 } from "uuid";
 import { mdiCloseThick, mdiPlusThick } from "@mdi/js";
-import type { Expense, Participant, Result, Trip } from "~/type/common";
+import type { Result, Trip } from "~/type/common";
+import type { TripDraft } from "~/composables/useTripDraft";
 import type { VTextField } from "vuetify/components";
 
 const reachGoal = useMetrikaGoal();
@@ -224,17 +238,40 @@ async function installApp() {
   }
 }
 
-const form = ref<{
-  name: string;
-  participants: Participant[];
-  expenses: Expense[];
-}>({
+const form = ref<TripDraft>({
   name: "",
   participants: [],
   expenses: [],
 });
 
 useTripDraft(form);
+
+const showLoadedFromLink = ref(false);
+
+// Хеш читаем сразу: vue-router нормализует адрес при инициализации и
+// успевает его вычистить раньше, чем сработает onMounted.
+const encodedTrip = import.meta.client
+  ? new URLSearchParams(window.location.hash.slice(1)).get(LINK_HASH_KEY)
+  : null;
+
+// Расчёт может приехать ссылкой из чата — она важнее сохранённого черновика.
+// useTripDraft восстанавливается в своём onMounted раньше, поэтому здесь
+// мы осознанно перезаписываем форму.
+onMounted(async () => {
+  if (!encodedTrip) return;
+
+  const shared = await decodeTrip(encodedTrip);
+
+  if (!shared) return;
+
+  form.value = shared;
+  showLoadedFromLink.value = true;
+  reachGoal("open_link");
+
+  // убираем данные из адреса: иначе обновление страницы вернёт исходный
+  // расчёт и затрёт траты, которые человек добавил от себя
+  window.history.replaceState(null, "", window.location.pathname);
+});
 
 const fieldRefs = ref<(InstanceType<typeof VTextField> | null)[]>([]);
 
@@ -277,6 +314,9 @@ const readableDebts = ref<Result>({
   items: [],
   forCopy: [],
 });
+
+// ссылка на текущий расчёт, пустая — если расчёт слишком большой для URL
+const tripLink = ref("");
 
 // Функция валидации формы
 const validateForm = (): { isValid: boolean; message: string } => {
@@ -366,6 +406,15 @@ const createTrip = () => {
     participants: trip.participants.length,
     expenses: trip.expenses.length,
   });
+
+  buildTripLink(form.value, window.location.origin)
+    .then((link) => {
+      tripLink.value = link.length > MAX_LINK_LENGTH ? "" : link;
+    })
+    .catch(() => {
+      // без ссылки расчёт всё равно работает, кнопку просто не покажем
+      tripLink.value = "";
+    });
 };
 
 const addExpense = () => {
