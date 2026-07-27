@@ -1,21 +1,26 @@
 <template>
   <div>
     <div class="d-flex justify-center img-wrapper">
-      <img src="~/assets/img/logo.png" alt="" />
+      <img src="~/assets/img/logo.png" alt="" >
     </div>
 
     <div class="wrapper">
-      <h1>TripSplit - калькулятор совместынх расходов</h1>
-      <div class="text-h5 text-center mb-2">
-        Никакой путаницы в совместных расходах
-      </div>
+      <h1 class="text-h5 text-center mb-2">
+        Кто кому сколько должен: калькулятор совместных расходов
+      </h1>
       <p class="text-body-2 text-center mb-10">
-        Добавляйте участников и расходы за пару кликов, мгновенно получайте, кто
-        кому сколько должен, и копируйте результат в чат одним нажатием.
+        Скинулись на продукты, ресторан или поездку? Добавьте участников и
+        траты — калькулятор посчитает, кто кому сколько должен, и результат
+        можно отправить в чат одним нажатием. Без регистрации.
       </p>
       <div class="grid">
         <div>
-          <VTextField v-model="form.name" label="Название поездки" />
+          <VTextField
+            v-model="form.name"
+            label="Название"
+            placeholder="Дача, день рождения, поездка"
+            persistent-placeholder
+          />
         </div>
 
         <div>
@@ -103,15 +108,12 @@
         <div class="d-flex flex-column">
           <VBtn color="black" @click="createTrip">Рассчитать</VBtn>
           <VBtn
-            v-if="
-              readableDebts?.items.length ||
-              (readableDebts?.forCopy && readableDebts.forCopy.length > 2)
-            "
+            v-if="form.participants.length || form.expenses.length"
             class="mt-4"
             variant="outlined"
             color="black"
             @click="clear"
-            >Очистить результат</VBtn
+            >Очистить всё</VBtn
           >
         </div>
       </div>
@@ -126,7 +128,7 @@
         size="small"
         variant="outlined"
         class="mt-4"
-        @click="modelExampleDialog = true"
+        @click="openExample"
         >Пример расчета</VBtn
       >
     </div>
@@ -168,14 +170,10 @@
 <script lang="ts" setup>
 import { v4 as uuidv4 } from "uuid";
 import { mdiCloseThick, mdiPlusThick } from "@mdi/js";
-import type {
-  Balance,
-  Expense,
-  Participant,
-  Result,
-  Trip,
-} from "~/type/common";
+import type { Expense, Participant, Result, Trip } from "~/type/common";
 import type { VTextField } from "vuetify/components";
+
+const reachGoal = useMetrikaGoal();
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -215,6 +213,7 @@ onBeforeUnmount(() => {
 async function installApp() {
   const prompt = deferredInstallPrompt.value;
   if (!prompt) return;
+  reachGoal("install_app");
   installingApp.value = true;
   try {
     await prompt.prompt();
@@ -234,6 +233,8 @@ const form = ref<{
   participants: [],
   expenses: [],
 });
+
+useTripDraft(form);
 
 const fieldRefs = ref<(InstanceType<typeof VTextField> | null)[]>([]);
 
@@ -345,6 +346,7 @@ const createTrip = () => {
   if (!validation.isValid) {
     errorMessage.value = validation.message;
     showErrorSnackbar.value = true;
+    reachGoal("calc_invalid", { reason: validation.message });
     return;
   }
 
@@ -356,11 +358,14 @@ const createTrip = () => {
     createdAt: new Date().toISOString(),
   };
 
-  const rawBalance = calculateBalance(trip);
-  const simplified = simplifyBalance(rawBalance);
-  readableDebts.value = formatBalanceToText(simplified, trip.participants);
+  readableDebts.value = calculateTrip(trip);
 
   modelDialog.value = true;
+
+  reachGoal("calc", {
+    participants: trip.participants.length,
+    expenses: trip.expenses.length,
+  });
 };
 
 const addExpense = () => {
@@ -382,103 +387,17 @@ const itemsPaidBy = computed(() => {
   return form.value.participants;
 });
 
-const calculateBalance = (trip: Trip): Balance => {
-  const balance: Balance = {};
 
-  for (const expense of trip.expenses) {
-    const { amount, paidBy, sharedWith } = expense;
-    const share = Number(amount) / sharedWith.length;
-
-    for (const userId of sharedWith) {
-      if (userId === paidBy) continue;
-
-      // Инициализируем вложенные объекты
-      if (!balance[userId]) balance[userId] = {};
-      if (!balance[userId][paidBy]) balance[userId][paidBy] = 0;
-
-      balance[userId][paidBy] += share;
-    }
-  }
-
-  // Округлим до 2 знаков
-  for (const debtor in balance) {
-    for (const creditor in balance[debtor]) {
-      balance[debtor][creditor] =
-        Math.round(balance[debtor][creditor] * 100) / 100;
-    }
-  }
-
-  return balance;
-};
-
-const simplifyBalance = (balance: Balance): Balance => {
-  const simplified: Balance = {};
-
-  for (const debtorId in balance) {
-    for (const creditorId in balance[debtorId]) {
-      const amount = balance[debtorId][creditorId];
-      if (amount <= 0) continue;
-
-      const reverseAmount = balance[creditorId]?.[debtorId] || 0;
-      const net = amount - reverseAmount;
-
-      if (net > 0) {
-        if (!simplified[debtorId]) simplified[debtorId] = {};
-        simplified[debtorId][creditorId] = Math.round(net * 100) / 100;
-      } else if (net < 0) {
-        if (!simplified[creditorId]) simplified[creditorId] = {};
-        simplified[creditorId][debtorId] = Math.round(-net * 100) / 100;
-      }
-      // если net === 0 — ничего не сохраняем
-    }
-  }
-
-  return simplified;
-};
-
-const formatBalanceToText = (
-  balance: Balance,
-  participants: Participant[],
-): Result => {
-  const getNameById = (id: string) =>
-    participants.find((p) => p.id === id)?.name || id;
-
-  const result: Result = {
-    items: [],
-    forCopy: [],
-  };
-
-  // Проверяем количество участников
-  if (participants.length === 1) {
-    result.forCopy.push("Никаких долгов нет - все расходы свои!");
-    return result;
-  }
-
-  for (const debtorId in balance) {
-    for (const creditorId in balance[debtorId]) {
-      const amount = balance[debtorId][creditorId];
-      if (amount <= 0) continue;
-
-      const debtorName = getNameById(debtorId);
-      const creditorName = getNameById(creditorId);
-
-      result.forCopy.push(`${debtorName} → ${creditorName}:  ${amount} ₽`);
-
-      result.items.push({
-        debtorName,
-        creditorName,
-        amount,
-      });
-    }
-  }
-
-  return result;
+const openExample = () => {
+  modelExampleDialog.value = true;
+  reachGoal("example_open");
 };
 
 const clear = () => {
   form.value.name = "";
   form.value.participants = [];
   form.value.expenses = [];
+  readableDebts.value = { items: [], forCopy: [] };
 };
 </script>
 
@@ -512,11 +431,5 @@ const clear = () => {
       max-width: 135px;
     }
   }
-}
-
-h1 {
-  opacity: 0;
-  height: 0;
-  width: 0;
 }
 </style>

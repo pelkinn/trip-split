@@ -17,7 +17,8 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: "ru" },
-      title: "TripSplit — Калькулятор совместных расходов",
+      title:
+        "Кто кому сколько должен — калькулятор совместных расходов | TripSplit",
       meta: [
         { charset: "utf-8" },
         { name: "language", content: "ru" },
@@ -26,17 +27,17 @@ export default defineNuxtConfig({
         {
           name: "description",
           content:
-            "TripSplit — калькулятор совместных расходов. Безлимит участников, офлайн‑режим и мгновенный расчёт долгов с копированием результата в один клик.",
+            "Посчитайте онлайн, кто кому сколько должен после совместных трат. Разделите расходы на компанию друзей — продукты, ресторан, праздник, поездку. Без регистрации, результат копируется в чат одним нажатием.",
         },
 
         {
           property: "og:title",
-          content: "TripSplit — калькулятор совместных расходов",
+          content: "Кто кому сколько должен — калькулятор совместных расходов",
         },
         {
           property: "og:description",
           content:
-            "Простой способ разделить расходы между участниками поездки.",
+            "Разделите расходы на компанию и узнайте, кто кому сколько должен. Без регистрации.",
         },
         { property: "og:type", content: "website" },
         { property: "og:url", content: "https://trip-split.ru" },
@@ -65,7 +66,7 @@ export default defineNuxtConfig({
     "@nuxtjs/sitemap",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
-        // @ts-expect-error
+        // @ts-expect-error типы vite-plugin-vuetify не совпадают с типами vite у Nuxt
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
@@ -88,7 +89,7 @@ export default defineNuxtConfig({
     manifest: {
       name: "TripSplit",
       short_name: "TripSplit",
-      description: "Рассчет долгов при совместных тратах",
+      description: "Кто кому сколько должен: расчёт совместных расходов",
       lang: "ru",
       theme_color: "#e0f7fa",
       background_color: "#e0f7fa",
@@ -109,6 +110,6 @@ export default defineNuxtConfig({
 
   site: {
     url: "https://trip-split.ru",
-    name: "TripSplit — калькулятор совместных расходов",
+    name: "TripSplit — кто кому сколько должен, калькулятор совместных расходов",
   },
 });

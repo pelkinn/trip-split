@@ -7,15 +7,39 @@
     </v-main>
     <v-footer class="footer" app>
       <div class="footer__content">
-        Разработка —
-        <a href="https://t.me/pelkin" target="_blank" rel="noopener noreferrer">
-          Александр Перепелкин
-        </a>
+        <div>
+          Разработка —
+          <a
+            href="https://t.me/pelkin"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Александр Перепелкин
+          </a>
+        </div>
+        <div v-if="DONATE_URL" class="footer__donate">
+          Сервис бесплатный и сделан одним человеком. Если помог —
+          <a
+            :href="DONATE_URL"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="reachGoal('donate_click')"
+          >
+            можно закинуть на кофе
+          </a>
+        </div>
       </div>
     </v-footer>
   </v-app>
   <VitePwaManifest />
 </template>
+
+<script lang="ts" setup>
+// ссылка на донат (ЮMoney / CloudTips). Пусто — блок в подвале не показывается
+const DONATE_URL = "https://pay.cloudtips.ru/p/7e481b45";
+
+const reachGoal = useMetrikaGoal();
+</script>
 
 <style scoped>
 .main {
@@ -31,12 +55,24 @@
   position: absolute !important;
 }
 
+.footer__content {
+  text-align: center;
+}
+
 .footer__content,
 .footer__content a {
   color: rgba(0, 0, 0, 0.5);
   text-decoration: none;
   font-size: 14px;
   transition: color 0.2s ease;
+}
+
+.footer__donate {
+  margin-top: 4px;
+}
+
+.footer__donate a {
+  text-decoration: underline;
 }
 
 .footer__content a:hover {

@@ -36,7 +36,7 @@ export interface Result {
   items: {
     debtorName: string;
     creditorName: string;
-    amount: number;
+    amount: string; // уже отформатированная сумма в рублях
   }[];
   forCopy: string[];
 }
