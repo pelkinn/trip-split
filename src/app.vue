@@ -7,6 +7,9 @@
     </v-main>
     <v-footer class="footer" app>
       <div class="footer__content">
+        <div class="mb-2">
+          <NuxtLink to="/blog">Блог</NuxtLink>
+        </div>
         <div>
           Разработка —
           <a
@@ -87,6 +90,8 @@ const reachGoal = useMetrikaGoal();
 
 .main::before {
   content: "";
+  /* декоративный слой поверх контента — не должен перехватывать клики по ссылкам */
+  pointer-events: none;
   position: absolute;
   top: 0;
   left: 0;
