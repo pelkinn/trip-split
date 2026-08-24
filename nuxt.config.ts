@@ -55,21 +55,12 @@ export default defineNuxtConfig({
 
   css: ["~/assets/style/main.scss"],
 
-  // блог обязан отдаваться статикой: prerender списка + обход ссылок на статьи
-  nitro: {
-    prerender: {
-      crawlLinks: true,
-      routes: ["/", "/blog"],
-    },
-  },
-
   build: {
     transpile: ["vuetify"],
   },
 
   modules: [
     "@nuxt/eslint",
-    "@nuxt/content",
     "@vite-pwa/nuxt",
     "~/modules/yandexMetrika",
     "@nuxtjs/sitemap",
@@ -115,10 +106,6 @@ export default defineNuxtConfig({
         },
       ],
     },
-  },
-
-  sitemap: {
-    sources: ["/api/__sitemap__/urls"],
   },
 
   site: {

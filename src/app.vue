@@ -7,9 +7,6 @@
     </v-main>
     <v-footer class="footer" app>
       <div class="footer__content">
-        <div class="mb-2">
-          <NuxtLink to="/blog">Блог</NuxtLink>
-        </div>
         <div>
           Разработка —
           <a
